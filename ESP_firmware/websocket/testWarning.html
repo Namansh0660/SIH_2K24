@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Data Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+        }
+        #data {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .warning {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Sensor Data Viewer</h1>
+    <div id="data">
+        <p><strong>Temperature:</strong> <span id="temp">N/A</span> °C</p>
+        <p><strong>Acceleration (X, Y, Z):</strong> 
+            <span id="accel_x">N/A</span> m/s², 
+            <span id="accel_y">N/A</span> m/s², 
+            <span id="accel_z">N/A</span> m/s²
+        </p>
+        <p><strong>Gyroscope (X, Y, Z):</strong> 
+            <span id="gyro_x">N/A</span> rad/s, 
+            <span id="gyro_y">N/A</span> rad/s, 
+            <span id="gyro_z">N/A</span> rad/s
+        </p>
+        <p><strong>Sound Level:</strong> <span id="sound">N/A</span></p>
+        <p id="warning" class="warning">No Warning</p>
+    </div>
+
+    <script>
+        // Connect to WebSocket server
+        const ws = new WebSocket('ws://192.168.236.222:81/');
+
+        // Update HTML elements with sensor data
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+
+            document.getElementById('temp').innerText = data.temp.toFixed(2);
+            document.getElementById('accel_x').innerText = data.accel_x.toFixed(2);
+            document.getElementById('accel_y').innerText = data.accel_y.toFixed(2);
+            document.getElementById('accel_z').innerText = data.accel_z.toFixed(2);
+            document.getElementById('gyro_x').innerText = data.gyro_x.toFixed(2);
+            document.getElementById('gyro_y').innerText = data.gyro_y.toFixed(2);
+            document.getElementById('gyro_z').innerText = data.gyro_z.toFixed(2);
+            document.getElementById('sound').innerText = data.sound;
+
+            // Display warning if triggered
+            if (data.warning == 1) {
+                document.getElementById('warning').innerText = "Warning: Significant Acceleration Change Detected!";
+            } else {
+                document.getElementById('warning').innerText = "No Warning";
+            }
+        };
+    </script>
+
+</body>
+</html>

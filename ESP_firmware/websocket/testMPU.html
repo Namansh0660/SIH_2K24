@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live MPU6050 Sensor Data</title>
+  <script>
+    let socket;
+
+    function startWebSocket() {
+      // Replace this with the actual IP address of your ESP32
+      socket = new WebSocket('ws://192.168.66.222:81/');
+
+      socket.onopen = function(event) {
+        console.log("WebSocket is open.");
+      };
+
+      socket.onmessage = function(event) {
+        const sensorData = JSON.parse(event.data);  // Parse the JSON sensor data
+
+        // Update HTML with the received MPU6050 data
+        document.getElementById('temp').innerText = sensorData.temp;
+        document.getElementById('accel_x').innerText = sensorData.accel_x;
+        document.getElementById('accel_y').innerText = sensorData.accel_y;
+        document.getElementById('accel_z').innerText = sensorData.accel_z;
+        document.getElementById('gyro_x').innerText = sensorData.gyro_x;
+        document.getElementById('gyro_y').innerText = sensorData.gyro_y;
+        document.getElementById('gyro_z').innerText = sensorData.gyro_z;
+        
+        console.log("Received: ", sensorData);
+      };
+
+      socket.onclose = function(event) {
+        console.log("WebSocket is closed.");
+      };
+    }
+  </script>
+</head>
+<body onload="startWebSocket()">
+  <h1>Live MPU6050 Sensor Data from ESP32</h1>
+  <p>Temperature: <span id="temp">Waiting...</span> °C</p>
+  <h2>Acceleration (m/s²)</h2>
+  <p>X: <span id="accel_x">Waiting...</span></p>
+  <p>Y: <span id="accel_y">Waiting...</span></p>
+  <p>Z: <span id="accel_z">Waiting...</span></p>
+  <h2>Gyroscope (rad/s)</h2>
+  <p>X: <span id="gyro_x">Waiting...</span></p>
+  <p>Y: <span id="gyro_y">Waiting...</span></p>
+  <p>Z: <span id="gyro_z">Waiting...</span></p>
+</body>
+</html>
